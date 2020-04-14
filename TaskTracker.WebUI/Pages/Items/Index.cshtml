@@ -1,0 +1,69 @@
+﻿@page "{contextID:int?}"
+@model TaskTracker.WebUI.Pages.Items.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row">
+    <div class="col-2">
+        @await Component.InvokeAsync("ContextList", new { selectedID = Model.ContextID })
+    </div>
+    <div class="col-10">
+        <form>
+            <p>
+                Title: <input type="text" asp-for="SearchString" />
+                Show completed: <input type="checkbox" asp-for="ShowCompleted" />
+                <input type="submit" value="Filter" />
+            </p>
+        </form>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemModel[0].Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemModel[0].IsCompleted)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemModel[0].DueDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ItemModel[0].CreatedDate)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.ItemModel)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IsCompleted)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DueDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CreatedDate)
+                        </td>
+                        <td>
+                            <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
+                            <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                            <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <p>
+            <a asp-page="Create" asp-route-contextID="@Model.ContextID">Create New</a>
+        </p>
+    </div>
+</div>

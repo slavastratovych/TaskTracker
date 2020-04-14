@@ -1,0 +1,16 @@
+﻿@model IEnumerable<ContextModel>
+
+<ul class="nav nav-pills flex-column">
+    @foreach (ContextModel item in Model)
+    {
+        var linkCssClass = "nav-link";
+        if (item.IsSelected)
+        {
+            linkCssClass += " active";
+        }
+
+        <li class="nav-item">
+            <a asp-page="/Items/Index" asp-route-contextID="@item.ID" class="@linkCssClass">@item.Name</a>
+        </li>
+    }
+</ul>

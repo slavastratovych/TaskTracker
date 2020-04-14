@@ -1,0 +1,43 @@
+﻿@page
+@model TaskTracker.WebUI.Pages.Items.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Item</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ItemModel.ContextID" value="@Model.ContextID" />
+            
+            <div class="form-group">
+                <label asp-for="ItemModel.Name" class="control-label"></label>
+                <input asp-for="ItemModel.Name" class="form-control" />
+                <span asp-validation-for="ItemModel.Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ItemModel.DueDate" class="control-label"></label>
+                <input asp-for="ItemModel.DueDate" class="form-control" />
+                <span asp-validation-for="ItemModel.DueDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index" asp-route-contextID="@Model.ContextID">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
