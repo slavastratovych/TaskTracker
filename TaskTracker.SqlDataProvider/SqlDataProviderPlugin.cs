@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TaskTracker.DomainLogic.Contexts;
@@ -12,8 +13,9 @@ namespace TaskTracker.SqlDataProvider
     {
         public void AddServices(IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<TaskTrackerContext>(options =>
-                options.UseSqlServer(config.GetConnectionString(nameof(TaskTrackerContext))));
+            //services.AddDbContext<TaskTrackerContext>(options =>
+            //    options.UseSqlServer(config.GetConnectionString(nameof(TaskTrackerContext))));
+
             services.AddScoped<ItemRepository, SqlItemRepository>();
             services.AddScoped<ContextRepository, SqlContextRepository>();
         }
