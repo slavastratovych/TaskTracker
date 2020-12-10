@@ -13,7 +13,7 @@
     <div class="col-md-4">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ItemModel.ID" />
+            <input type="hidden" asp-for="ItemModel.Id" />
 
             <div class="form-group">
                 <label asp-for="ItemModel.Name" class="control-label"></label>
@@ -34,15 +34,8 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="ItemModel.CreatedDate" class="control-label"></label>
-                <input asp-for="ItemModel.CreatedDate" class="form-control" />
-                <span asp-validation-for="ItemModel.CreatedDate" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="ItemModel.ContextID" class="control-label"></label>
-                <select asp-for="ItemModel.ContextID" asp-items="Model.Contexts"></select>
-                <span asp-validation-for="ItemModel.DueDate" class="text-danger"></span>
+                <label asp-for="ItemModel.ContextId" class="control-label"></label>
+                <select asp-for="ItemModel.ContextId" asp-items="Model.Contexts"></select>
             </div>
 
             <div class="form-group">
@@ -53,7 +46,7 @@
 </div>
 
 <div>
-    <a asp-page="./Index">Back to List</a>
+    <a asp-page="/Contexts/Index" asp-route-selectedID="@Model.ItemModel.ContextId">Back to List</a>
 </div>
 
 @section Scripts {

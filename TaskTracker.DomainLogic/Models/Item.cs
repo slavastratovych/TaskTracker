@@ -4,7 +4,7 @@ namespace TaskTracker.DomainLogic.Models
 {
     public class Item
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         public string Name { get; set; }
 
@@ -14,7 +14,7 @@ namespace TaskTracker.DomainLogic.Models
 
         public DateTime? DueDate { get; set; }
 
-        public int ContextID { get; set; }
+        public int ContextId { get; set; }
 
         public Context Context { get; set; }
     }

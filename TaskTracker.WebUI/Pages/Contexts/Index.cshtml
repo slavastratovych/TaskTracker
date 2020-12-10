@@ -1,0 +1,67 @@
+﻿@page "{selectedID:int?}"
+@model TaskTracker.WebUI.IndexModel
+@using System.Linq;
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-2">
+        <ul class="nav nav-pills flex-column">
+            @foreach (ContextModel item in Model.ContextModel)
+            {
+                var linkCssClass = "nav-link";
+                if (item.Id == Model.SelectedId)
+                {
+                    linkCssClass += " active";
+                }
+                <li class="nav-item">
+                    <a asp-page="Index" asp-route-selectedID="@item.Id" class="@linkCssClass">@item.Name</a>
+                </li>
+            }
+        </ul>
+        <a class="btn btn-primary btn-block mt-4" asp-page="Create" role="button">Add Context</a>
+    </div>
+    <div class="col-10">
+        <nav class="navbar">
+            <form class="form-inline">
+                @{
+                    var checkboxCssClass = "btn btn-secondary";
+                    if (Model.ShowCompleted)
+                    {
+                        checkboxCssClass += " active";
+                    }
+                }
+                <input type="search" asp-for="SearchString" class="form-control" placeholder="Search" aria-label="Search" />
+                <div class="btn-group-toggle mx-2" data-toggle="buttons">
+                    <label class="@checkboxCssClass">
+                        <input type="checkbox" asp-for="ShowCompleted" autocomplete="off" /> Done
+                    </label>
+                </div>
+                <input class="btn btn-primary" type="submit" value="Search" />
+            </form>
+            <div>
+                <a class="btn btn-primary" asp-page="Details" asp-route-id="@Model.SelectedId" role="button">Details</a>
+                @if (!Model.ContextModel.Single(x => x.Id == Model.SelectedId).IsDefault)
+                {
+                    <a class="btn btn-primary mx-1" asp-page="Edit" asp-route-id="@Model.SelectedId" role="button">Edit</a>
+                    <a class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.SelectedId" role="button">Delete</a>
+                }
+            </div>
+        </nav>
+
+        @await Component.InvokeAsync("ItemList", new
+        {
+            userId = Model.UserId,
+            contextId = Model.SelectedId,
+            searchString = Model.SearchString,
+            showCompleted = Model.ShowCompleted
+        })
+
+        <p>
+            <a asp-page="/Items/Create" asp-route-contextId="@Model.SelectedId">Create New</a>
+        </p>
+    </div>
+</div>

@@ -6,7 +6,7 @@ namespace TaskTracker.WebUI.ViewModels
 {
     public class ItemModel
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [Required, StringLength(50)]
         public string Name { get; set; }
@@ -14,13 +14,13 @@ namespace TaskTracker.WebUI.ViewModels
         [Display(Name = "Done")]
         public bool IsCompleted { get; set; }
 
-        [DataType(DataType.Date), Display(Name = "Date of creation")]
+        [DataType(DataType.Date), Display(Name = "Created Date")]
         public DateTime CreatedDate { get; set; }
 
-        [DataType(DataType.Date), Display(Name = "Due date")]
+        [DataType(DataType.Date), Display(Name = "Due Date")]
         public DateTime? DueDate { get; set; }
 
-        public int ContextID { get; set; }
+        public int ContextId { get; set; }
     }
 
     public static class ItemModelExtensions
@@ -34,12 +34,12 @@ namespace TaskTracker.WebUI.ViewModels
 
             return new ItemModel()
             {
-                ID = item.ID,
+                Id = item.Id,
                 CreatedDate = item.CreatedDate,
                 IsCompleted = item.IsCompleted,
                 Name = item.Name,
                 DueDate = item.DueDate,
-                ContextID = item.ContextID
+                ContextId = item.ContextId
             };
         }
 
@@ -52,12 +52,12 @@ namespace TaskTracker.WebUI.ViewModels
 
             return new Item()
             {
-                ID = viewModel.ID,
+                Id = viewModel.Id,
                 CreatedDate = viewModel.CreatedDate,
                 IsCompleted = viewModel.IsCompleted,
                 Name = viewModel.Name,
                 DueDate = viewModel.DueDate,
-                ContextID = viewModel.ContextID
+                ContextId = viewModel.ContextId
             };
         }
     }

@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Contexts;
 using TaskTracker.DomainLogic.Items;
-using TaskTracker.DomainLogic.Models;
 using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI.Pages.Items
@@ -14,11 +14,13 @@ namespace TaskTracker.WebUI.Pages.Items
     {
         private readonly ItemRepository _itemRepository;
         private readonly ContextRepository _contextRepository;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public EditModel(ItemRepository itemRepository, ContextRepository contextRepository)
+        public EditModel(ItemRepository itemRepository, ContextRepository contextRepository, UserManager<IdentityUser> userManager)
         {
             _itemRepository = itemRepository ?? throw new ArgumentNullException(nameof(itemRepository));
             _contextRepository = contextRepository ?? throw new ArgumentNullException(nameof(contextRepository));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         [BindProperty]
@@ -41,8 +43,11 @@ namespace TaskTracker.WebUI.Pages.Items
             }
 
             ItemModel = item.ToViewModel();
-            var contextList = await _contextRepository.GetContextsAsync(User).ConfigureAwait(false);
-            Contexts = new SelectList(contextList, "ID", "Name");
+
+            string userId = _userManager.GetUserId(User);
+            var contextList = await _contextRepository.GetContextsAsync(userId).ConfigureAwait(false);
+
+            Contexts = new SelectList(contextList, "Id", "Name");
 
             return Page();
         }
@@ -62,7 +67,7 @@ namespace TaskTracker.WebUI.Pages.Items
             }
             catch (Exception)
             {
-                if (!ItemExists(ItemModel.ID))
+                if (!await ItemExists(ItemModel.Id).ConfigureAwait(false))
                 {
                     return NotFound();
                 }
@@ -72,12 +77,12 @@ namespace TaskTracker.WebUI.Pages.Items
                 }
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("/Contexts/Index", new { selectedID = ItemModel.ContextId });
         }
 
-        private bool ItemExists(int id)
+        private async Task<bool> ItemExists(int id)
         {
-            return _itemRepository.GetItemAsync(id) != null;
+            return await _itemRepository.GetItemAsync(id).ConfigureAwait(false) != null;
         }
     }
 }

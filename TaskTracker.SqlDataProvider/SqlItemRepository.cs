@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Items;
 using TaskTracker.DomainLogic.Models;
@@ -18,43 +17,30 @@ namespace TaskTracker.SqlDataProvider.Repositories
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public override async Task<IList<Item>> GetItemsAsync(
-            IPrincipal user, string searchString, bool includeCompleted)
-        {
-            IQueryable<Item> items = DoGetItems(searchString, includeCompleted);
-
-            return await items.ToListAsync().ConfigureAwait(false);
-        }
-
-        public override async Task<IList<Item>> GetItemsByContextAsync(IPrincipal user, int contextID, string searchString, bool includeCompleted)
-        {
-            IQueryable<Item> items = DoGetItems(searchString, includeCompleted);
-
-            items = items.Where(x => x.ContextID == contextID);
-
-            return await items.ToListAsync().ConfigureAwait(false);
-        }
-
-        private IQueryable<Item> DoGetItems(string searchString, bool includeCompleted)
+        public override async Task<IEnumerable<Item>> GetItemsByContextAsync(int contextId, string searchString, bool includeCompleted)
         {
             IQueryable<Item> items = _context.Item;
 
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                items = items.Where(i => i.Name.Contains(searchString));
-            }
+            items = items.Where(x => x.ContextId == contextId);
 
             if (!includeCompleted)
             {
                 items = items.Where(i => i.IsCompleted == includeCompleted);
             }
 
-            return items;
+            var result = await items.ToListAsync().ConfigureAwait(false);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                return result.Where(i => i.Name.Contains(searchString, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return result;
         }
 
         public override async Task<Item> GetItemAsync(int id)
         {
-            return await _context.Item.FirstOrDefaultAsync(m => m.ID == id).ConfigureAwait(false);
+            return await _context.Item.FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
         }
 
         public override async Task AddItemAsync(Item item)

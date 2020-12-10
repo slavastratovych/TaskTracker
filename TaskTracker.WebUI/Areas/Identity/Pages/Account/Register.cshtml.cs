@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using TaskTracker.DomainLogic;
+using TaskTracker.DomainLogic.Contexts;
+using TaskTracker.DomainLogic.Models;
 
 namespace TaskTracker.WebUI.Areas.Identity.Pages.Account
 {
@@ -23,17 +26,20 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ContextRepository _contextRepository;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ContextRepository contextRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _contextRepository = contextRepository;
         }
 
         [BindProperty]
@@ -78,6 +84,13 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    await _contextRepository.AddContextAsync(new Context()
+                    {
+                        Name = Constants.Inbox,
+                        IsDefault = true,
+                        UserId = user.Id
+                    }).ConfigureAwait(false);
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

@@ -1,14 +1,19 @@
-﻿using TaskTracker.DomainLogic.Models;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using TaskTracker.DomainLogic.Models;
 
 namespace TaskTracker.WebUI.ViewModels
 {
     public class ContextModel
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
 
+        [Required, StringLength(50)]
         public string Name { get; set; }
 
-        public bool IsSelected { get; set; }
+        public string UserId { get; set; }
+
+        public bool IsDefault { get; set; }
     }
 
     public static class ContextModelExtensions
@@ -17,13 +22,31 @@ namespace TaskTracker.WebUI.ViewModels
         {
             if (item is null)
             {
-                throw new System.ArgumentNullException(nameof(item));
+                throw new ArgumentNullException(nameof(item));
             }
 
             return new ContextModel()
             {
-                ID = item.ID,
-                Name = item.Name
+                Id = item.Id,
+                Name = item.Name,
+                UserId = item.UserId,
+                IsDefault = item.IsDefault
+            };
+        }
+
+        public static Context ToDomainModel(this ContextModel viewModel)
+        {
+            if (viewModel is null)
+            {
+                throw new ArgumentNullException(nameof(viewModel));
+            }
+
+            return new Context()
+            {
+                Id = viewModel.Id,
+                Name = viewModel.Name,
+                UserId = viewModel.UserId,
+                IsDefault = viewModel.IsDefault
             };
         }
     }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Models;
 
@@ -7,11 +6,7 @@ namespace TaskTracker.DomainLogic.Items
 {
     public abstract class ItemRepository
     {
-        public abstract Task<IList<Item>> GetItemsAsync(
-            IPrincipal user, string searchString, bool includeCompleted);
-
-        public abstract Task<IList<Item>> GetItemsByContextAsync(
-            IPrincipal user, int contextID, string searchString, bool includeCompleted);
+        public abstract Task<IEnumerable<Item>> GetItemsByContextAsync(int contextID, string searchString, bool includeCompleted);
 
         public abstract Task AddItemAsync(Item item);
 
