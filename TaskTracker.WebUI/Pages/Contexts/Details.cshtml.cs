@@ -1,18 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Contexts;
 using TaskTracker.DomainLogic.Models;
+using TaskTracker.WebUI.Authorization;
+using TaskTracker.WebUI.Pages.Contexts;
 
 namespace TaskTracker.WebUI
 {
-    public class DetailsModel : PageModel
+    public class DetailsModel : BaseContextPageModel
     {
-        private readonly ContextRepository _contextRepository;
-
-        public DetailsModel(ContextRepository contextRepository)
+        public DetailsModel(
+            ContextRepository contextRepository,
+            UserManager<IdentityUser> userManager,
+            IAuthorizationService authorizationService)
+            : base(contextRepository, userManager, authorizationService)
         {
-            this._contextRepository = contextRepository;
         }
 
         public Context Context { get; set; }
@@ -24,11 +28,18 @@ namespace TaskTracker.WebUI
                 return NotFound();
             }
 
-            Context = await _contextRepository.GetContextAsync(id.Value).ConfigureAwait(false);
+            Context = await ContextRepository.GetContextAsync(id.Value).ConfigureAwait(false);
 
             if (Context == null)
             {
                 return NotFound();
+            }
+
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Context, Operations.AccessContext);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
             }
 
             return Page();

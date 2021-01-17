@@ -46,7 +46,7 @@ namespace TaskTracker.WebUI.Pages.Items
 
             await _itemRepository.RemoveItemAsync(id.Value).ConfigureAwait(false);
 
-            return RedirectToPage("/Contexts/Index", new { selectedID = ItemModel.ContextId });
+            return RedirectToPage("/Contexts/Index", new { contextId = ItemModel.ContextId });
         }
     }
 }

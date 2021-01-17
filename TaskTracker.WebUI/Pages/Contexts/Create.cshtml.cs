@@ -1,21 +1,21 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Contexts;
+using TaskTracker.WebUI.Pages.Contexts;
 using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI
 {
-    public class CreateModel : PageModel
+    public class CreateModel : BaseContextPageModel
     {
-        private readonly ContextRepository _contextRepository;
-        private readonly UserManager<IdentityUser> _userManager;
-
-        public CreateModel(ContextRepository contextRepository, UserManager<IdentityUser> userManager)
+        public CreateModel(
+            ContextRepository contextRepository,
+            UserManager<IdentityUser> userManager,
+            IAuthorizationService authorizationService)
+            : base(contextRepository, userManager, authorizationService)
         {
-            _contextRepository = contextRepository;
-            _userManager = userManager;
         }
 
         public IActionResult OnGet()
@@ -35,9 +35,9 @@ namespace TaskTracker.WebUI
                 return Page();
             }
 
-            Context.UserId = _userManager.GetUserId(User);
+            Context.UserId = UserManager.GetUserId(User);
 
-            await _contextRepository
+            await ContextRepository
                 .AddContextAsync(Context.ToDomainModel())
                 .ConfigureAwait(false);
 

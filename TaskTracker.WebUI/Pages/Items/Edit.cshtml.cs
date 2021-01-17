@@ -77,7 +77,7 @@ namespace TaskTracker.WebUI.Pages.Items
                 }
             }
 
-            return RedirectToPage("/Contexts/Index", new { selectedID = ItemModel.ContextId });
+            return RedirectToPage("/Contexts/Index", new { contextId = ItemModel.ContextId });
         }
 
         private async Task<bool> ItemExists(int id)

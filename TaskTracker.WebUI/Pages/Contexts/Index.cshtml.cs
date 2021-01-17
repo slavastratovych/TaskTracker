@@ -1,31 +1,32 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Contexts;
 using TaskTracker.DomainLogic.Models;
+using TaskTracker.WebUI.Authorization;
+using TaskTracker.WebUI.Pages.Contexts;
 using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI
 {
-    public class IndexModel : PageModel
+    public class IndexModel : BaseContextPageModel
     {
-        private readonly ContextRepository _contextRepository;
-        private readonly UserManager<IdentityUser> _userManager;
-
-        public IndexModel(ContextRepository contextRepository, UserManager<IdentityUser> userManager)
+        public IndexModel(
+            ContextRepository contextRepository,
+            UserManager<IdentityUser> userManager,
+            IAuthorizationService authorizationService)
+            : base(contextRepository, userManager, authorizationService)
         {
-            _contextRepository = contextRepository;
-            _userManager = userManager;
         }
 
         public IList<ContextModel> ContextModel { get; private set; }
 
         public string UserId { get; private set; }
 
-        public int SelectedId { get; private set; }
+        public int SelectedContextId { get; private set; }
 
         [BindProperty(SupportsGet = true)]
         public string SearchString { get; set; }
@@ -33,21 +34,37 @@ namespace TaskTracker.WebUI
         [BindProperty(SupportsGet = true)]
         public bool ShowCompleted { get; set; }
 
-        public async Task OnGetAsync(int? selectedID)
+        public async Task<IActionResult> OnGetAsync(int? contextId)
         {
-            UserId = _userManager.GetUserId(User);
-            IList<Context> contexts = await _contextRepository.GetContextsAsync(UserId).ConfigureAwait(false);
+            UserId = UserManager.GetUserId(User);
+            IList<Context> userContexts = await ContextRepository.GetContextsAsync(UserId);
 
-            if (selectedID.HasValue && contexts.Any(x => x.Id == selectedID))
+            if (contextId.HasValue)
             {
-                SelectedId = selectedID.Value;
+                var selectedContext = await ContextRepository.GetContextAsync(contextId.Value);
+
+                if (selectedContext == null)
+                {
+                    return NotFound();
+                }
+
+                var isAuthorized = await AuthorizationService.AuthorizeAsync(User, selectedContext, Operations.AccessContext);
+
+                if (!isAuthorized.Succeeded)
+                {
+                    return Forbid();
+                }
+
+                SelectedContextId = contextId.Value;
             }
             else
             {
-                SelectedId = contexts.First(x => x.IsDefault).Id;
+                SelectedContextId = userContexts.First(x => x.IsDefault).Id;
             }
 
-            ContextModel = contexts.Select(x => x.ToViewModel()).ToList();
+            ContextModel = userContexts.Select(x => x.ToViewModel()).ToList();
+
+            return Page();
         }
     }
 }
