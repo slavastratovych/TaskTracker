@@ -42,6 +42,6 @@
         <input type="hidden" asp-for="ItemModel.Id" />
         <input type="hidden" asp-for="ItemModel.ContextId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-page="/Contexts/Index" asp-route-selectedID="@Model.ItemModel.ContextId">Back to List</a>
+        <a asp-page="/Contexts/Index" asp-route-contextId="@Model.ItemModel.ContextId">Back to List</a>
     </form>
 </div>

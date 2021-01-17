@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TaskTracker.Infrastructure;
+using TaskTracker.WebUI.Authorization;
 
 namespace TaskTracker.WebUI
 {
@@ -28,6 +29,7 @@ namespace TaskTracker.WebUI
                     .RequireAuthenticatedUser()
                     .Build();
             });
+            services.AddScoped<IAuthorizationHandler, ContextOwnerAuthorizationHandler>();
 
             string dataProviderPluginTypeName = Configuration["Plugins:DataProvider"];
             services.AddPlugin(dataProviderPluginTypeName, Configuration);

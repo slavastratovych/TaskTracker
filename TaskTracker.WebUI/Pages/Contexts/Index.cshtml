@@ -1,4 +1,4 @@
-﻿@page "{selectedID:int?}"
+﻿@page "{contextId:int?}"
 @model TaskTracker.WebUI.IndexModel
 @using System.Linq;
 
@@ -13,12 +13,12 @@
             @foreach (ContextModel item in Model.ContextModel)
             {
                 var linkCssClass = "nav-link";
-                if (item.Id == Model.SelectedId)
+                if (item.Id == Model.SelectedContextId)
                 {
                     linkCssClass += " active";
                 }
                 <li class="nav-item">
-                    <a asp-page="Index" asp-route-selectedID="@item.Id" class="@linkCssClass">@item.Name</a>
+                    <a asp-page="Index" asp-route-contextId="@item.Id" class="@linkCssClass">@item.Name</a>
                 </li>
             }
         </ul>
@@ -43,25 +43,25 @@
                 <input class="btn btn-primary" type="submit" value="Search" />
             </form>
             <div>
-                <a class="btn btn-primary" asp-page="Details" asp-route-id="@Model.SelectedId" role="button">Details</a>
-                @if (!Model.ContextModel.Single(x => x.Id == Model.SelectedId).IsDefault)
+                <a class="btn btn-primary" asp-page="Details" asp-route-id="@Model.SelectedContextId" role="button">Details</a>
+                @if (!Model.ContextModel.Single(x => x.Id == Model.SelectedContextId).IsDefault)
                 {
-                    <a class="btn btn-primary mx-1" asp-page="Edit" asp-route-id="@Model.SelectedId" role="button">Edit</a>
-                    <a class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.SelectedId" role="button">Delete</a>
+                    <a class="btn btn-primary mx-1" asp-page="Edit" asp-route-id="@Model.SelectedContextId" role="button">Edit</a>
+                    <a class="btn btn-danger" asp-page="Delete" asp-route-id="@Model.SelectedContextId" role="button">Delete</a>
                 }
             </div>
         </nav>
 
         @await Component.InvokeAsync("ItemList", new
-        {
-            userId = Model.UserId,
-            contextId = Model.SelectedId,
-            searchString = Model.SearchString,
-            showCompleted = Model.ShowCompleted
-        })
+   {
+       userId = Model.UserId,
+       contextId = Model.SelectedContextId,
+       searchString = Model.SearchString,
+       showCompleted = Model.ShowCompleted
+   })
 
         <p>
-            <a asp-page="/Items/Create" asp-route-contextId="@Model.SelectedId">Create New</a>
+            <a asp-page="/Items/Create" asp-route-contextId="@Model.SelectedContextId">Create New</a>
         </p>
     </div>
 </div>

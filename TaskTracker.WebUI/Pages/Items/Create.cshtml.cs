@@ -39,7 +39,7 @@ namespace TaskTracker.WebUI.Pages.Items
             Item.CreatedDate = DateTime.UtcNow;
             await _itemRepository.AddItemAsync(Item.ToDomainModel()).ConfigureAwait(false);
 
-            return RedirectToPage("/Contexts/Index", new { selectedID = Item.ContextId });
+            return RedirectToPage("/Contexts/Index", new { contextId = Item.ContextId });
         }
     }
 }
