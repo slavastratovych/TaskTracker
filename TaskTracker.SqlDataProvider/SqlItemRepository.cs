@@ -40,7 +40,10 @@ namespace TaskTracker.SqlDataProvider.Repositories
 
         public override async Task<Item> GetItemAsync(int id)
         {
-            return await _context.Item.FirstOrDefaultAsync(m => m.Id == id).ConfigureAwait(false);
+            return await _context.Item
+                .Include(x => x.Context)
+                .FirstOrDefaultAsync(m => m.Id == id)
+                .ConfigureAwait(false);
         }
 
         public override async Task AddItemAsync(Item item)

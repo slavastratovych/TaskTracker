@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Contexts;
-using TaskTracker.DomainLogic.Models;
 using TaskTracker.WebUI.Authorization;
 using TaskTracker.WebUI.Pages.Contexts;
+using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI
 {
@@ -19,7 +19,7 @@ namespace TaskTracker.WebUI
         {
         }
 
-        public Context Context { get; set; }
+        public ContextModel Context { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,19 +28,21 @@ namespace TaskTracker.WebUI
                 return NotFound();
             }
 
-            Context = await ContextRepository.GetContextAsync(id.Value).ConfigureAwait(false);
+            var context = await ContextRepository.GetContextAsync(id.Value).ConfigureAwait(false);
 
-            if (Context == null)
+            if (context == null)
             {
                 return NotFound();
             }
 
-            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Context, Operations.AccessContext);
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, context, ProtectedOperations.AccessContext);
 
             if (!isAuthorized.Succeeded)
             {
                 return Forbid();
             }
+
+            Context = context.ToViewModel();
 
             return Page();
         }

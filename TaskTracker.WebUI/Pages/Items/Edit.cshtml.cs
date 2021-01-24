@@ -1,26 +1,28 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Contexts;
 using TaskTracker.DomainLogic.Items;
+using TaskTracker.WebUI.Authorization;
 using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI.Pages.Items
 {
-    public class EditModel : PageModel
+    public class EditModel : BaseItemPageModel
     {
-        private readonly ItemRepository _itemRepository;
         private readonly ContextRepository _contextRepository;
-        private readonly UserManager<IdentityUser> _userManager;
 
-        public EditModel(ItemRepository itemRepository, ContextRepository contextRepository, UserManager<IdentityUser> userManager)
+        public EditModel(
+            ItemRepository itemRepository,
+            ContextRepository contextRepository,
+            UserManager<IdentityUser> userManager,
+            IAuthorizationService authorizationService)
+            : base(itemRepository, userManager, authorizationService)
         {
-            _itemRepository = itemRepository ?? throw new ArgumentNullException(nameof(itemRepository));
             _contextRepository = contextRepository ?? throw new ArgumentNullException(nameof(contextRepository));
-            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         }
 
         [BindProperty]
@@ -35,16 +37,23 @@ namespace TaskTracker.WebUI.Pages.Items
                 return NotFound();
             }
 
-            var item = await _itemRepository.GetItemAsync(id.Value).ConfigureAwait(false);
+            var item = await ItemRepository.GetItemAsync(id.Value).ConfigureAwait(false);
 
             if (item == null)
             {
                 return NotFound();
             }
 
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, item.Context, ProtectedOperations.AccessContext);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
             ItemModel = item.ToViewModel();
 
-            string userId = _userManager.GetUserId(User);
+            string userId = UserManager.GetUserId(User);
             var contextList = await _contextRepository.GetContextsAsync(userId).ConfigureAwait(false);
 
             Contexts = new SelectList(contextList, "Id", "Name");
@@ -61,28 +70,37 @@ namespace TaskTracker.WebUI.Pages.Items
                 return Page();
             }
 
-            try
+            var oldItem = await ItemRepository.GetItemAsync(ItemModel.Id).ConfigureAwait(false);
+
+            if (oldItem == null)
             {
-                await _itemRepository.UpdateItemAsync(ItemModel.ToDomainModel()).ConfigureAwait(false);
+                return NotFound();
             }
-            catch (Exception)
+
+            var isOldContexOwner = await AuthorizationService.AuthorizeAsync(User, oldItem.Context, ProtectedOperations.AccessContext);
+
+            if (!isOldContexOwner.Succeeded)
             {
-                if (!await ItemExists(ItemModel.Id).ConfigureAwait(false))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return Forbid();
             }
+
+            var newContext = await _contextRepository.GetContextAsync(ItemModel.ContextId).ConfigureAwait(false);
+
+            var isNewContextOwner = await AuthorizationService.AuthorizeAsync(User, newContext, ProtectedOperations.AccessContext);
+
+            if (!isNewContextOwner.Succeeded)
+            {
+                return Forbid();
+            }
+
+            oldItem.Name = ItemModel.Name;
+            oldItem.IsCompleted = ItemModel.IsCompleted;
+            oldItem.DueDate = ItemModel.DueDate;
+            oldItem.ContextId = ItemModel.ContextId;
+
+            await ItemRepository.UpdateItemAsync(oldItem).ConfigureAwait(false);
 
             return RedirectToPage("/Contexts/Index", new { contextId = ItemModel.ContextId });
-        }
-
-        private async Task<bool> ItemExists(int id)
-        {
-            return await _itemRepository.GetItemAsync(id).ConfigureAwait(false) != null;
         }
     }
 }

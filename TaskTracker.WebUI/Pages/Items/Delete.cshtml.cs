@@ -1,18 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Items;
+using TaskTracker.WebUI.Authorization;
 using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI.Pages.Items
 {
-    public class DeleteModel : PageModel
+    public class DeleteModel : BaseItemPageModel
     {
-        private readonly ItemRepository _itemRepository;
-
-        public DeleteModel(ItemRepository itemRepository)
+        public DeleteModel(
+            ItemRepository itemRepository,
+            UserManager<IdentityUser> userManager,
+            IAuthorizationService authorizationService)
+            : base(itemRepository, userManager, authorizationService)
         {
-            _itemRepository = itemRepository;
         }
 
         [BindProperty]
@@ -25,11 +28,18 @@ namespace TaskTracker.WebUI.Pages.Items
                 return NotFound();
             }
 
-            var item = await _itemRepository.GetItemAsync(id.Value).ConfigureAwait(false);
+            var item = await ItemRepository.GetItemAsync(id.Value).ConfigureAwait(false);
 
             if (item == null)
             {
                 return NotFound();
+            }
+
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, item.Context, ProtectedOperations.AccessContext).ConfigureAwait(false);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
             }
 
             ItemModel = item.ToViewModel();
@@ -44,7 +54,21 @@ namespace TaskTracker.WebUI.Pages.Items
                 return NotFound();
             }
 
-            await _itemRepository.RemoveItemAsync(id.Value).ConfigureAwait(false);
+            var item = await ItemRepository.GetItemAsync(id.Value).ConfigureAwait(false);
+
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, item.Context, ProtectedOperations.AccessContext).ConfigureAwait(false);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
+            await ItemRepository.RemoveItemAsync(id.Value).ConfigureAwait(false);
 
             return RedirectToPage("/Contexts/Index", new { contextId = ItemModel.ContextId });
         }

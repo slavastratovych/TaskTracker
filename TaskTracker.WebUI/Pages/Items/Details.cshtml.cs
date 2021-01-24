@@ -1,18 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TaskTracker.DomainLogic.Items;
+using TaskTracker.WebUI.Authorization;
 using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI.Pages.Items
 {
-    public class DetailsModel : PageModel
+    public class DetailsModel : BaseItemPageModel
     {
-        private readonly ItemRepository _itemRepository;
-
-        public DetailsModel(ItemRepository itemRepository)
+        public DetailsModel(
+            ItemRepository itemRepository,
+            UserManager<IdentityUser> userManager,
+            IAuthorizationService authorizationService)
+            : base(itemRepository, userManager, authorizationService)
         {
-            _itemRepository = itemRepository;
         }
 
         public ItemModel ItemModel { get; set; }
@@ -24,11 +27,18 @@ namespace TaskTracker.WebUI.Pages.Items
                 return NotFound();
             }
 
-            var item = await _itemRepository.GetItemAsync(id.Value).ConfigureAwait(false);
+            var item = await ItemRepository.GetItemAsync(id.Value).ConfigureAwait(false);
 
             if (item == null)
             {
                 return NotFound();
+            }
+
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, item.Context, ProtectedOperations.AccessContext);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
             }
 
             ItemModel = item.ToViewModel();
