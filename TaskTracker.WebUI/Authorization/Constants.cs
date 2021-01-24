@@ -8,7 +8,5 @@ namespace TaskTracker.WebUI.Authorization
     public static class Constants
     {
         public const string AccessContextOperationName = "AccessContext";
-
-        public const string AccessItemOperationName = "AccessItem";
     }
 }

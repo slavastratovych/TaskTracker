@@ -36,7 +36,7 @@ namespace TaskTracker.WebUI
                 return NotFound();
             }
 
-            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Context, Operations.AccessContext);
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Context, ProtectedOperations.AccessContext);
 
             if (!isAuthorized.Succeeded)
             {
@@ -55,7 +55,7 @@ namespace TaskTracker.WebUI
 
             Context = await ContextRepository.GetContextAsync(id.Value).ConfigureAwait(false);
 
-            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Context, Operations.AccessContext);
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Context, ProtectedOperations.AccessContext);
 
             if (!isAuthorized.Succeeded)
             {

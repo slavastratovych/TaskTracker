@@ -48,7 +48,7 @@ namespace TaskTracker.WebUI
                     return NotFound();
                 }
 
-                var isAuthorized = await AuthorizationService.AuthorizeAsync(User, selectedContext, Operations.AccessContext);
+                var isAuthorized = await AuthorizationService.AuthorizeAsync(User, selectedContext, ProtectedOperations.AccessContext);
 
                 if (!isAuthorized.Succeeded)
                 {

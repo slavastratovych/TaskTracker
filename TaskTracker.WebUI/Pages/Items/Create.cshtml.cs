@@ -1,26 +1,48 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using TaskTracker.DomainLogic.Contexts;
 using TaskTracker.DomainLogic.Items;
+using TaskTracker.WebUI.Authorization;
 using TaskTracker.WebUI.ViewModels;
 
 namespace TaskTracker.WebUI.Pages.Items
 {
-    public class CreateModel : PageModel
+    public class CreateModel : BaseItemPageModel
     {
-        private readonly ItemRepository _itemRepository;
+        private readonly ContextRepository _contextRepository;
 
-        public CreateModel(ItemRepository itemRepository)
+        public CreateModel(
+            ItemRepository itemRepository,
+            ContextRepository contextRepository,
+            UserManager<IdentityUser> userManager,
+            IAuthorizationService authorizationService)
+            : base(itemRepository, userManager, authorizationService)
         {
-            _itemRepository = itemRepository ?? throw new ArgumentNullException(nameof(itemRepository));
-        }        
+            _contextRepository = contextRepository ?? throw new ArgumentNullException(nameof(contextRepository));
+        }
 
         [BindProperty]
         public ItemModel Item { get; set; }
 
-        public IActionResult OnGet(int contextId)
+        public async Task<IActionResult> OnGet(int contextId)
         {
+            var context = await _contextRepository.GetContextAsync(contextId).ConfigureAwait(false);
+
+            if (context == null)
+            {
+                return NotFound();
+            }
+
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, context, ProtectedOperations.AccessContext);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
             Item = new ItemModel();
             Item.ContextId = contextId;
 
@@ -36,8 +58,22 @@ namespace TaskTracker.WebUI.Pages.Items
                 return Page();
             }
 
+            var context = await _contextRepository.GetContextAsync(Item.ContextId).ConfigureAwait(false);
+
+            if (context == null)
+            {
+                return NotFound();
+            }
+
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, context, ProtectedOperations.AccessContext);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
             Item.CreatedDate = DateTime.UtcNow;
-            await _itemRepository.AddItemAsync(Item.ToDomainModel()).ConfigureAwait(false);
+            await ItemRepository.AddItemAsync(Item.ToDomainModel()).ConfigureAwait(false);
 
             return RedirectToPage("/Contexts/Index", new { contextId = Item.ContextId });
         }
