@@ -13,9 +13,8 @@ namespace TaskTracker.SqlDataProvider
     {
         public void AddServices(IServiceCollection services, IConfiguration config)
         {
-            //services.AddDbContext<TaskTrackerContext>(options =>
-            //    options.UseSqlServer(config.GetConnectionString(nameof(TaskTrackerContext))));
-
+            // services.AddDbContext<TaskTrackerContext>(options =>
+            // options.UseSqlServer(config.GetConnectionString(nameof(TaskTrackerContext))));
             services.AddScoped<ItemRepository, SqlItemRepository>();
             services.AddScoped<ContextRepository, SqlContextRepository>();
         }

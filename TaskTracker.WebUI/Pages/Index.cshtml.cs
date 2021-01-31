@@ -16,7 +16,6 @@ namespace TaskTracker.WebUI.Pages
 
         public void OnGet()
         {
-
         }
     }
 }

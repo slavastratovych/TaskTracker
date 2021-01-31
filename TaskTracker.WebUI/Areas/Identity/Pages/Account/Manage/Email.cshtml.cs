@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 {
@@ -40,27 +37,6 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 
         [BindProperty]
         public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            [Required]
-            [EmailAddress]
-            [Display(Name = "New email")]
-            public string NewEmail { get; set; }
-        }
-
-        private async Task LoadAsync(IdentityUser user)
-        {
-            var email = await _userManager.GetEmailAsync(user);
-            Email = email;
-
-            Input = new InputModel
-            {
-                NewEmail = email,
-            };
-
-            IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
-        }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -141,6 +117,27 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 
             StatusMessage = "Verification email sent. Please check your email.";
             return RedirectToPage();
+        }
+
+        private async Task LoadAsync(IdentityUser user)
+        {
+            var email = await _userManager.GetEmailAsync(user);
+            Email = email;
+
+            Input = new InputModel
+            {
+                NewEmail = email,
+            };
+
+            IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+        }
+
+        public class InputModel
+        {
+            [Required]
+            [EmailAddress]
+            [Display(Name = "New email")]
+            public string NewEmail { get; set; }
         }
     }
 }

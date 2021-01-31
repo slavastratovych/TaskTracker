@@ -22,11 +22,11 @@ namespace TaskTracker.SqlDataProvider
 
             var contexts = new Context[]
             {
-                new Context { Name="Home" },
-                new Context { Name="Work" }
+                new Context { Name = "Home" },
+                new Context { Name = "Work" },
             };
 
-            foreach (var context in contexts)
+            foreach (Context context in contexts)
             {
                 dbContext.Context.Add(context);
             }

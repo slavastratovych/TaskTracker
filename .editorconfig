@@ -210,3 +210,31 @@ dotnet_naming_style.prefix_underscore.required_prefix = _
 dotnet_naming_style.prefix_underscore.required_suffix = 
 dotnet_naming_style.prefix_underscore.word_separator = 
 dotnet_naming_style.prefix_underscore.capitalization = camel_case
+
+#### StyleCop rules ####
+
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1309: Field names should not begin with underscore
+dotnet_diagnostic.SA1309.severity = none
+
+#### TODO: Temporary disabled documentation rules ####
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = suggestion
+
+# SA1601: Partial elements should be documented
+dotnet_diagnostic.SA1601.severity = suggestion
+
+# SA1633: File should have header
+dotnet_diagnostic.SA1633.severity = suggestion
+
+# SA0001 XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+
+# C# Razor code behind files
+[*cshtml.cs]
+
+# SA1649: File name should match first type name
+dotnet_diagnostic.SA1649.severity = none

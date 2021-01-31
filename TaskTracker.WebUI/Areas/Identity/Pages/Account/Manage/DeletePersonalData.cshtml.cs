@@ -1,10 +1,10 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 {
@@ -26,13 +26,6 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 
         [BindProperty]
         public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            [Required]
-            [DataType(DataType.Password)]
-            public string Password { get; set; }
-        }
 
         public bool RequirePassword { get; set; }
 
@@ -78,6 +71,13 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
             _logger.LogInformation("User with ID '{UserId}' deleted themselves.", userId);
 
             return Redirect("~/");
+        }
+
+        public class InputModel
+        {
+            [Required]
+            [DataType(DataType.Password)]
+            public string Password { get; set; }
         }
     }
 }

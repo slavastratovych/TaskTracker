@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 {
@@ -29,26 +27,6 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 
         [BindProperty]
         public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            [Phone]
-            [Display(Name = "Phone number")]
-            public string PhoneNumber { get; set; }
-        }
-
-        private async Task LoadAsync(IdentityUser user)
-        {
-            var userName = await _userManager.GetUserNameAsync(user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
-
-            Input = new InputModel
-            {
-                PhoneNumber = phoneNumber
-            };
-        }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -90,6 +68,26 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
+        }
+
+        private async Task LoadAsync(IdentityUser user)
+        {
+            var userName = await _userManager.GetUserNameAsync(user);
+            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+
+            Username = userName;
+
+            Input = new InputModel
+            {
+                PhoneNumber = phoneNumber,
+            };
+        }
+
+        public class InputModel
+        {
+            [Phone]
+            [Display(Name = "Phone number")]
+            public string PhoneNumber { get; set; }
         }
     }
 }

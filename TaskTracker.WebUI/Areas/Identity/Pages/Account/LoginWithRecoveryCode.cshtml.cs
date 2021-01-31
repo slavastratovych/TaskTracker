@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace TaskTracker.WebUI.Areas.Identity.Pages.Account
 {
@@ -27,15 +27,6 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account
         public InputModel Input { get; set; }
 
         public string ReturnUrl { get; set; }
-
-        public class InputModel
-        {
-            [BindProperty]
-            [Required]
-            [DataType(DataType.Text)]
-            [Display(Name = "Recovery Code")]
-            public string RecoveryCode { get; set; }
-        }
 
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
@@ -73,6 +64,7 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);
                 return LocalRedirect(returnUrl ?? Url.Content("~/"));
             }
+
             if (result.IsLockedOut)
             {
                 _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
@@ -84,6 +76,15 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return Page();
             }
+        }
+
+        public class InputModel
+        {
+            [BindProperty]
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Recovery Code")]
+            public string RecoveryCode { get; set; }
         }
     }
 }

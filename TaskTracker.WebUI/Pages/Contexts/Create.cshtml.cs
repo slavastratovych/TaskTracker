@@ -18,13 +18,13 @@ namespace TaskTracker.WebUI
         {
         }
 
+        [BindProperty]
+        public ContextModel Context { get; set; }
+
         public IActionResult OnGet()
         {
             return Page();
         }
-
-        [BindProperty]
-        public ContextModel Context { get; set; }
 
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://aka.ms/RazorPagesCRUD.

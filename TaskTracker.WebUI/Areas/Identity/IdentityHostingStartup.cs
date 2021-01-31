@@ -1,12 +1,13 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using TaskTracker.SqlDataProvider;
 
 [assembly: HostingStartup(typeof(TaskTracker.WebUI.Areas.Identity.IdentityHostingStartup))]
+
 namespace TaskTracker.WebUI.Areas.Identity
 {
     public class IdentityHostingStartup : IHostingStartup
@@ -18,7 +19,8 @@ namespace TaskTracker.WebUI.Areas.Identity
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.ConfigureServices((context, services) => {
+            builder.ConfigureServices((context, services) =>
+            {
                 services.AddDbContext<TaskTrackerContext>(options =>
                     options.UseSqlServer(
                         context.Configuration.GetConnectionString("TaskTrackerContext")));

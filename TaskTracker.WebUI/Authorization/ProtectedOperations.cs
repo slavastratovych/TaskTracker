@@ -4,6 +4,6 @@ namespace TaskTracker.WebUI.Authorization
 {
     public static class ProtectedOperations
     {
-        public static OperationAuthorizationRequirement AccessContext = new OperationAuthorizationRequirement { Name = Constants.AccessContextOperationName };
+        public static readonly OperationAuthorizationRequirement AccessContext = new OperationAuthorizationRequirement { Name = Constants.AccessContextOperationName };
     }
 }

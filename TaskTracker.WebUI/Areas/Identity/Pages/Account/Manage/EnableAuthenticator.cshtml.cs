@@ -1,25 +1,25 @@
-﻿using System;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
 
 namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 {
     public class EnableAuthenticatorModel : PageModel
     {
+        private const string _authenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
+
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<EnableAuthenticatorModel> _logger;
         private readonly UrlEncoder _urlEncoder;
-
-        private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
         public EnableAuthenticatorModel(
             UserManager<IdentityUser> userManager,
@@ -43,15 +43,6 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
 
         [BindProperty]
         public InputModel Input { get; set; }
-
-        public class InputModel
-        {
-            [Required]
-            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-            [DataType(DataType.Text)]
-            [Display(Name = "Verification Code")]
-            public string Code { get; set; }
-        }
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -136,6 +127,7 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
                 result.Append(unformattedKey.Substring(currentPosition, 4)).Append(" ");
                 currentPosition += 4;
             }
+
             if (currentPosition < unformattedKey.Length)
             {
                 result.Append(unformattedKey.Substring(currentPosition));
@@ -147,10 +139,19 @@ namespace TaskTracker.WebUI.Areas.Identity.Pages.Account.Manage
         private string GenerateQrCodeUri(string email, string unformattedKey)
         {
             return string.Format(
-                AuthenticatorUriFormat,
+                _authenticatorUriFormat,
                 _urlEncoder.Encode("TaskTracker.WebUI"),
                 _urlEncoder.Encode(email),
                 unformattedKey);
+        }
+
+        public class InputModel
+        {
+            [Required]
+            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [DataType(DataType.Text)]
+            [Display(Name = "Verification Code")]
+            public string Code { get; set; }
         }
     }
 }
